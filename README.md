@@ -1,7 +1,7 @@
 # Project: Labradoodle or Fried Chicken? In Blakc and White. 
 ![image](figs/poodleKFC.jpg)
 
-### [Full Project Description](../doc/project3_desc.html)
+### [Full Project Description](doc/project3_desc.md)
 
 Term: Spring 2017
 
