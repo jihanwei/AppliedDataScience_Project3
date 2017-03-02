@@ -1,17 +1,17 @@
 # Project: Labradoodle or Fried Chicken? In Blakc and White. 
 ![image](figs/poodleKFC.jpg)
 
-### [Full Project Description](doc/project3_desc.html)
+### [Full Project Description](../doc/project3_desc.html)
 
 Term: Spring 2017
 
-+ Team #
++ Team 1
 + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+	+ Nie, Kexin kn2403@columbia.edu
+	+ Schiltz, Marie ms5293@columbia.edu
+	+ Wei, Jihan jw3447@columbia.edu
+	+ Zhu, Chenyun cz2434@columbia.edu
+	+ Zhu, He hz2429@columbia.edu
 
 + Project summary: In this project, we created a classification engine for grayscale images of poodles versus images of fried chickens. 
 	
