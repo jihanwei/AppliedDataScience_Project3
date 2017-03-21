@@ -24,7 +24,7 @@ extract_feature<- function(img_dir,data_name="new_feature", export=T){
   }
   # output constructed features
   if(export){
-    save(fe, file=paste0("../output/", data_name, "_", ".RData"))
+    save(fe, file=paste0("../output/", data_name, ".RData"))
   }
   return(fe)
 }
