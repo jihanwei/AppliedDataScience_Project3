@@ -17,7 +17,7 @@ sift.new <- t(sift)
 
 # Randomly split the data into test and training set
 # 75% training set and 25% test set
-n <- dim(sift.t)[1]
+n <- dim(sift.new)[1]
 set.seed(618)
 index <- sample(n, n*0.75)
 
