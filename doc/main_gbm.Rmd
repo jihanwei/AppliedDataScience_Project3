@@ -48,7 +48,7 @@ In this chunk, ,we have a set of controls for the evaluation experiments.
 + (T/F) run evaluation on an independent test set
 
 ```{r exp_setup}
-run.cv=TRUE # run cross-validation on the training set
+run.cv=FALSE # run cross-validation on the training set
 K <- 5  # number of CV folds
 run.test=TRUE # run evaluation on an independent test set
 
@@ -159,7 +159,6 @@ if(run.cv){
 } else {
   par_best <- list(nb_trees=13000, shrinkage=0.001)
 }
-
 
 ```
 
