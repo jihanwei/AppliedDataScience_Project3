@@ -16,7 +16,11 @@ if(!require("gbm")){
 if(!require("ggplot2")){
   install.packages("ggplot2")
 }
+if(!require("tidyr")){
+  install.packages("tidyr")
+}
 
+library("tidyr")
 library("gbm")
 library("ggplot2")
 ```
@@ -120,12 +124,12 @@ source("../lib/cross_validation_gbm.R")
 
 if(run.cv){
   err_cv <- data.frame(matrix(nrow=nb_trees,ncol=3))
-  for(k in 1:length(model_values)){
+  for(k in 1:length(shrinkage_values)){
     cat("k=", k, "\n")
-    err_cv[,k] <- cv.function(df.train, model_values[k], K)
+    err_cv[,k] <- cv.function(df.train, shrinkage_values[k], K)
   }
   err_cv$nb.trees <- seq_len(nb_trees)
-  err.cv <- gather(err.cv, shrinkage, error, X1:X3, factor_key=FALSE)
+  err_cv <- tidyr::gather(err_cv, shrinkage, error, X1:X3, factor_key=FALSE)
   save(err_cv, file="../output/gbm_err_cv.RData")
 }
 ```
@@ -136,7 +140,7 @@ Visualize cross-validation results.
 if(run.cv){
   load("../output/err_cv.RData")
   #pdf("../fig/cv_results.pdf", width=7, height=5)
-  g <- ggplot(err-cv, aes(nb.trees, error, colour=shrinkage)) +
+  g <- ggplot(err_cv, aes(nb.trees, error, colour=shrinkage)) +
   geom_line() +
   ylab("CV Error Rate") +
   xlab("Number of trees") + 
