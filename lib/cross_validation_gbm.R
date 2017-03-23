@@ -12,7 +12,7 @@ cv.function <- function(train, shr, K){
   library(gbm)
   
   
-  boost.fit <- gbm(labels~., data=train.subset,
+  boost.fit <- gbm(labels~., data=train,
                         distribution="bernoulli",
                         n.trees=15000,
                         interaction.depth=1,
