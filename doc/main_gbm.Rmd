@@ -155,9 +155,12 @@ if(run.cv){
   row <- which.min(err_cv$error)
   model_best.nb_trees <- err_cv$nb.trees[row]
   model_best.shrinkage <- err_cv$shrinkage[row]
+  par_best <- list(nb_trees=model_best.nb_trees, shrinkage=model_best.shrinkage)
+} else {
+  par_best <- list(nb_trees=13000, shrinkage=0.001)
 }
 
-par_best <- list(nb_trees=model_best.nb_trees, shrinkage=model_best.shrinkage)
+
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
@@ -173,8 +176,10 @@ Feed the final training model with the completely holdout testing data.
 tm_test=NA
 if(run.test){
   load(file="../output/fit_train.RData")
-  tm_test <- system.time(pred_test <- test(fit_train, test))
-  save(pred_test, file="../output/pred_test.RData")
+  tm_test <- system.time(pred_test <- test(fit_train, df.test))
+  save(pred_test, file="../output/gbm_pred_test.RData")
+  table(pred_test, df.test$labels)
+  1 - mean(pred_test==df.test$labels)
 }
 ```
 
