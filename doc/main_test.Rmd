@@ -10,14 +10,10 @@ output:
 #### Step 1: Load Packages.
 
 ```{r}
-if(!require("gbm")){
-  install.packages("gbm")
-}
-
 library("gbm")
 ```
 
-#### Step 2: specify directories.
+#### Step 2: Specify Directories.
 
 Provide directory for SIFT features
 ```{r}
@@ -57,7 +53,7 @@ Then we can use only the train set to train the models
 ```{r}
 per_train <- 0.75 # percentage of training data
 smp_size <- floor(per_train * nrow(df)) # size of the sample
-set.seed(12)
+set.seed(618)
 smp_ind <- sample(seq_len(nrow(df)), size = smp_size)
 train <- df[smp_ind, ]
 test <- df[-smp_ind, ]
@@ -202,6 +198,16 @@ summary(glm.fit)
 
 ## SVM Linear
 
+```{r}
+svmfit <- svm(labels~., data=train, kernel="linear", cost=10, scale=FALSE)
+```
+
+```{r}
+tune.svm.linear <- tune(svm, labels~. , data=train, kernel="linear", 
+                 ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)), scale=F)
+summary(tune.svm.linear)
+```
+
 Remove constant features - using the training set - not using the tesst set
 ```{r}
 cat("n## Removing the constants features.n")
@@ -216,9 +222,7 @@ for (f in names(train)) {
 }
 ```
 
-```{r}
-svmfit <- svm(labels~., data=train.rm, kernel="linear", cost=10, scale=TRUE)
-```
+
 
 ```{r}
 tune.svm.linear <- tune(svm, labels~. , data=train.pca, kernel="linear", 

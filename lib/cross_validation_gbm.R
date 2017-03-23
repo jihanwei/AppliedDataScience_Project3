@@ -7,7 +7,10 @@
 ### ADS Spring 2016
 
 
-cv.function <- function(X.train, y.train, d, K){
+cv.function <- function(train, shr, K){
+  
+  library(gbm)
+  
   
   boost.fit <- gbm(labels~., data=train.subset,
                         distribution="bernoulli",

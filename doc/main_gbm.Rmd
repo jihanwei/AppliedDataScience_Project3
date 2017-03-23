@@ -1,0 +1,188 @@
+---
+title: "Project 3 - Baseline Model - GBM is Tree-Depth of 1"
+author: "Marie Schiltz, using the templates provided by the professor"
+date: "March 22, 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+This file does the same as the main.Rmd but for the baseline model.
+
+Loading Required Packages
+```{r}
+if(!require("gbm")){
+  install.packages("gbm")
+}
+if(!require("ggplot2")){
+  install.packages("ggplot2")
+}
+
+library("gbm")
+library("ggplot2")
+```
+
+### Step 0: specify directories.
+
+Set the working directory to the image folder. Specify the training and the testing set. For data without an independent test/validation set, you need to create your own testing data by random subsampling. In order to obain reproducible results, set.seed() whenever randomization is used. 
+
+Provide directories for raw images. Training set and test set should be in different subfolders. 
+```{r}
+img_dir <- "../../data/raw_images/" 
+```
+
+Provide directories for reading the features and labels
+```{r}
+features_dir <- "../../data/sift_features/"
+labels_dir <- "../../data/"
+```
+
+
+### Step 1: set up controls for evaluation experiments.
+
+In this chunk, ,we have a set of controls for the evaluation experiments. 
+
++ (T/F) cross-validation on the training set
++ (number) K, the number of CV folds
++ (T/F) process features for training set
++ (T/F) run evaluation on an independent test set
++ (T/F) run evaluation on an independent test set
+
+```{r exp_setup}
+run.cv=TRUE # run cross-validation on the training set
+K <- 5  # number of CV folds
+run.test=TRUE # run evaluation on an independent test set
+
+# We won't process features in this code, they all have been processed before using Matlab - As a result they will be read 
+run.feature.train=TRUE # process features for training set
+run.feature.test=TRUE # process features for test set
+```
+
+Using cross-validation or independent test set evaluation, we compare the performance of different classifiers or classifiers with different specifications. 
+In this notebook, we use GBM with depth 1, and we are going to compare different models with different shrinkage parameters and different number of trees.
+
+
+```{r model_setup}
+shrinkage_values <- c(0.1, 0.01, 0.001)
+model_labels = paste("GBM with shrinkage parameters =", shrinkage_values)
+nb_trees <- 15000
+```
+
+### Step 2: import training images class labels.
+
+```{r train_label}
+df <- read.csv(paste0(features_dir, "sift_features.csv"))
+labels <- read.csv(paste0(labels_dir, "labels.csv"))
+```
+
+Format the data
+```{r}
+df <- data.table::transpose(df)
+names(labels) = c("labels")
+df <- cbind(labels, df)
+```
+
+Create a test and a train set
+Training and Test Set - Whole Dataset
+Then we can use only the train set to train the models
+```{r}
+per_train <- 0.75 # percentage of training data
+smp_size <- floor(per_train * nrow(df)) # size of the sample
+set.seed(0)
+smp_ind <- sample(seq_len(nrow(df)), size = smp_size)
+df.train <- df[smp_ind, ]
+df.test <- df[-smp_ind, ]
+```
+
+### Step 3: construct visual feature
+
+As discussed earlier the feature extraction is not performed here.
+
+### Step 4: Train a classification model with training images
+Call the train model and test model from library. 
+
+`train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
++ `train.R`
+  + Input: a data table with the features and the labels
+  + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
++ `test.R`
+  + Input: a data table with the features and the labels
+  + Input: an R object that contains a trained classifiers.
+  + Output: an R object of class label predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
+```{r loadlib}
+source("../lib/train_gbm.R")
+source("../lib/test_gbm.R")
+```
+
+#### Model selection with cross-validation
+* Do model selection by choosing among different values of training model parameters, that is, the shrinkage parameter and the number of trees. 
+```{r runcv, message=FALSE, warning=FALSE}
+source("../lib/cross_validation_gbm.R")
+
+if(run.cv){
+  err_cv <- data.frame(matrix(nrow=nb_trees,ncol=3))
+  for(k in 1:length(model_values)){
+    cat("k=", k, "\n")
+    err_cv[,k] <- cv.function(df.train, model_values[k], K)
+  }
+  err_cv$nb.trees <- seq_len(nb_trees)
+  err.cv <- gather(err.cv, shrinkage, error, X1:X3, factor_key=FALSE)
+  save(err_cv, file="../output/gbm_err_cv.RData")
+}
+```
+
+Visualize cross-validation results. 
+
+```{r cv_vis}
+if(run.cv){
+  load("../output/err_cv.RData")
+  #pdf("../fig/cv_results.pdf", width=7, height=5)
+  g <- ggplot(err-cv, aes(nb.trees, error, colour=shrinkage)) +
+  geom_line() +
+  ylab("CV Error Rate") +
+  xlab("Number of trees") + 
+  labs(title="Baseline - GBM - Depth of 1") +
+  scale_color_discrete(name="Shrinkage", labels=c("0.1","0.01","0.001"))
+  g
+  #dev.off()
+}
+```
+
+
+* Choose the "best"" parameter value
+```{r best_model}
+model_best=model_values[1]
+if(run.cv){
+  row <- which.min(err_cv$error)
+  model_best.nb_trees <- err_cv$nb.trees[row]
+  model_best.shrinkage <- err_cv$shrinkage[row]
+}
+
+par_best <- list(nb_trees=model_best.nb_trees, shrinkage=model_best.shrinkage)
+```
+
+* Train the model with the entire training set using the selected model (model parameter) via cross-validation.
+```{r final_train}
+tm_train=NA
+tm_train <- system.time(fit_train <- train(df.train, par_best))
+save(fit_train, file="../output/gbm_fit_train.RData")
+```
+
+### Step 5: Make prediction 
+Feed the final training model with the completely holdout testing data. 
+```{r test}
+tm_test=NA
+if(run.test){
+  load(file="../output/fit_train.RData")
+  tm_test <- system.time(pred_test <- test(fit_train, test))
+  save(pred_test, file="../output/pred_test.RData")
+}
+```
+
+### Summarize Running Time
+Prediction performance matters, do does the running times for constructing features and for training the model, especially when the computation resource is limited. 
+```{r running_time}
+#cat("Time for constructing training features=", tm_feature_train[1], "s \n")
+#cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
+cat("Time for training model=", tm_train[1], "s \n")
+cat("Time for making prediction=", tm_test[1], "s \n")
+```
