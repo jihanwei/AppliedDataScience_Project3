@@ -217,7 +217,7 @@ if(!Baseline){
 
 if(Baseline){
   if(run.cv){
-  load("../output/err_cv_shr.RData")
+ # load("../output/gbm_err_cv_shr.RData")
   #pdf("../fig/cv_results.pdf", width=7, height=5)
   g <- ggplot(err_cv_shr, aes(nb.trees, error, colour=shrinkage)) +
   geom_line() +
