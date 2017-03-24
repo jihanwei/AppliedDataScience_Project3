@@ -96,7 +96,7 @@ if(new.feature.test){
   save(Independent_X, file="../output/Newfeature_test.RData")
   
 } else {
-  Independent_X<-t(read.csv(paste(extradata_dir,"sift_features/sift_features.csv",sep = ""),header=T))
+  Independent_X<-read.csv(paste(extradata_dir,"sift_features/sift_features.csv",sep = ""),header=T)
   Independent_X <- data.table::transpose(Independent_X)
 }
 }
