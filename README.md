@@ -22,15 +22,15 @@ Term: Spring 2017
   
   Part of the project each member is responsible for:
    
-  Baseline Model: Marie Schiltz
+     Baseline Model: Marie Schiltz
   
-  SVM: Jihan Wei
+     SVM: Jihan Wei
   
-  Random Forest: Chenyun Zhu
+     Random Forest: Chenyun Zhu
   
-  xgBoost: He Zhu
+     xgBoost: He Zhu
   
-  Features: Kexin Nie
+     Features: Kexin Nie
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
