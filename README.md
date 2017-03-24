@@ -17,6 +17,7 @@ Term: Spring 2017
   With the provided SIFT features, we tried SVM RandomForest and XgBoost, and chose xgBoost as advanced model. For new features, we used 
   GIST to extract 512 features.
 
++ The root code of our project is available at [Main.Rmd](doc/main.Rmd)
 
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
   
