@@ -1,19 +1,24 @@
-#########################################################
-### Train a classification model with training images ###
-#########################################################
+#Train xgboost
+train_xgboost <- function(train.D,parameters,rounds){
+  ### load libraries
+  library(xgboost)
+  fit_xgboost<-xgb.train( params              = parameters,
+                          data                = train.D,
+                          nrounds             = rounds, 
+                          verbose             = 1,
+                          maximize            = FALSE
+  )
+  return(fit_xgboost)
+}
 
-### Author: Yuting Ma
-### Project 3
-### ADS Spring 2016
 
 
-train <- function(dat_train, label_train, par=NULL){
+
+### Train a Gradient Boosting Model (GBM) using processed features from training images
+train_gbm <- function(train, par=NULL){
   
-  ### Train a Gradient Boosting Model (GBM) using processed features from training images
   
-  ### Input: 
-  ###  -  processed features from images 
-  ###  -  class labels for training images
+  ### Input: datatable containing processed features and labels
   ### Output: training model specification
   
   ### load libraries
@@ -21,17 +26,19 @@ train <- function(dat_train, label_train, par=NULL){
   
   ### Train with gradient boosting model
   if(is.null(par)){
-    depth <- 3
+    nb_trees <- 10000
+    shrinkage <- 0.01
   } else {
-    depth <- par$depth
+    nb_trees <- par$nb_trees + 1000
+    shr <- par$shrinkage
   }
-  fit_gbm <- gbm.fit(x=dat_train, y=label_train,
-                     n.trees=2000,
-                     distribution="bernoulli",
-                     interaction.depth=depth, 
-                     bag.fraction = 0.5,
-                     verbose=FALSE)
-  best_iter <- gbm.perf(fit_gbm, method="OOB", plot.it = FALSE)
-
-  return(list(fit=fit_gbm, iter=best_iter))
+  boost.fit <- gbm(labels~., data=train,
+                   distribution="bernoulli",
+                   n.trees=nb_trees,
+                   interaction.depth=1,
+                   shrinkage=shr)
+  
+  best_iter <- gbm.perf(boost.fit, method="OOB", plot.it = FALSE)
+  
+  return(list(fit=boost.fit, iter=best_iter))
 }

@@ -1,12 +1,20 @@
-######################################################
-### Fit the classification model with testing data ###
-######################################################
 
-### Author: Yuting Ma
-### Project 3
-### ADS Spring 2016
+test_xgboost <- function(fit_train, dat_test){
+  
+  ### load libraries
+  library(xgboost)
+  
+  testmodel <- data.matrix(dat_test,rownames.force = NA)
+  result <- predict (fit_train,testmodel)
+  result<-as.numeric(result > 0.5)
 
-test <- function(fit_train, dat_test){
+  
+  return(result)
+  
+}
+
+
+test_gbm <- function(fit_train, test){
   
   ### Fit the classfication model with testing data
   
@@ -18,9 +26,8 @@ test <- function(fit_train, dat_test){
   ### load libraries
   library("gbm")
   
-  pred <- predict(fit_train$fit, newdata=dat_test, 
+  pred <- predict(fit_train$fit, newdata=test, 
                   n.trees=fit_train$iter, type="response")
   
   return(as.numeric(pred> 0.5))
 }
-
