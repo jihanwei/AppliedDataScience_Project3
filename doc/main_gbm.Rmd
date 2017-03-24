@@ -168,8 +168,11 @@ if(run.cv){
 
 Compute CV Error on the train set with selected parameters
 ```{r}
-err_cv <- cv.function(df.train, K, par_best)
-save(err_cv, file="../output/gbm_err_cv.RData")
+if (run.cv){
+  err_cv <- cv.function(df.train, K, par_best)
+  save(err_cv, file="../output/gbm_err_cv.RData")
+}
+
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
