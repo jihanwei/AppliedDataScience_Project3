@@ -24,13 +24,13 @@ Term: Spring 2017
    
      Baseline Model: Marie Schiltz
   
-     SVM: Jihan Wei
+     SVM & Main File Construction: Jihan Wei
   
-     Random Forest: Chenyun Zhu
+     Random Forest & Project Presentation: Chenyun Zhu
+     
+     XgBoost & Features: He Zhu
   
-     xgBoost: He Zhu
-  
-     Features: Kexin Nie
+     Features Extraction: Kexin Nie
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
