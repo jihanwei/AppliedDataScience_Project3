@@ -154,14 +154,22 @@ if(run.cv){
 
 * Choose the "best"" parameter value
 ```{r best_model}
-model_best=model_values[1]
 if(run.cv){
   row <- which.min(err_cv_shr$error)
   model_best.nb_trees <- err_cv_shr$nb.trees[row]
   model_best.shrinkage <- err_cv_shr$shrinkage[row]
   par_best <- list(nb_trees=model_best.nb_trees, shrinkage=model_best.shrinkage)
+  if(par_best$shrinkage == "X1"){
+    par_best$shrinkage = 0.1
+  }
+  if(par_best$shrinkage == "X2"){
+    par_best$shrinkage = 0.01
+    }
+  if(par_best$shrinkage == "X3"){
+    par_best$shrinkage = 0.001
+  }
 } else {
-  par_best <- list(nb_trees=13000, shrinkage=0.001)
+  par_best <- list(nb_trees=13000, shrinkage=0.001) # Optimal values fund by running the cv part (which is really long on the baseline)
 }
 
 ```
