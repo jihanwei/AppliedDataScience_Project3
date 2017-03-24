@@ -14,7 +14,7 @@ Term: Spring 2017
 	+ Zhu, He hz2429@columbia.edu         
 
 + Project summary: In this project, we created a classification engine for grayscale images of poodles versus images of fried chickens. 
-  With the provided SIFT features, we tried SVM RandomForest and XgBoost, and chose       as advanced model. For new features, we used 
+  With the provided SIFT features, we tried SVM RandomForest and XgBoost, and chose xgBoost as advanced model. For new features, we used 
   GIST to extract 512 features.
 
 
