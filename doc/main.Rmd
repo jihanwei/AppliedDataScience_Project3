@@ -97,11 +97,12 @@ if(new.feature.test){
   
 } else {
   Independent_X<-t(read.csv(paste(extradata_dir,"sift_features/sift_features.csv",sep = ""),header=T))
+  Independent_X <- data.table::transpose(Independent_X)
 }
 }
 
 dim(X)
-#dim(Independent_X)
+dim(Independent_X)
 ```
 
 Step 3.2:Random split the data to training and testing set:
@@ -282,6 +283,7 @@ if (!Baseline){
   ##Save the model:
   save(fit_train_xg, file="../output/fit_train_xg.RData")
 }
+
   
 if (Baseline){ 
   if(run.cv){
@@ -298,19 +300,19 @@ if (Baseline){
     }
    if(par_best$shrinkage == "X3"){
       par_best$shrinkage = 0.001
-    }
+   }
+    
+    source("../lib/cross_validation_gbm.R")
+    err_cv <- cv.function(df.train, K, par_best)
+    #save(err_cv, file="../output/gbm_err_cv.RData")
   } else {
   par_best <- list(nb_trees=13000, shrinkage=0.001) # Optimal values fund by running the cv part (which is really long on the baseline)
   }
-    #source("../lib/cross_validation_gbm.R")
-    #err_cv <- cv.function(df.train, K, par_best)
-    #save(err_cv, file="../output/gbm_err_cv.RData")  
-
-  tm_train <- system.time(fit_train_gbm <- train_gbm(df.train, par_best))
-
+  tm_train <- system.time(fit_train <- train_gbm(df.train, par_best))
+  
   ##Save the model:
-  #save(fit_train_gbm, file="../output/gbm_fit_train.RData")
-}
+  #save(fit_train, file="../output/gbm_fit_train.RData")
+}  
 ```
 
 Step 5: Model Evaluation:
@@ -342,9 +344,9 @@ if(run.test){
   #load(file = ("../output/Newfeature_test.RData"))
   
   if (Baseline){
-    load(file="../output/fit_train_bgm.RData")
+    load(file="../output/gbm_fit_train.RData")
     tm_test <- system.time(
-           pred_newtest <-test_gbm(fit_train_gbm,Independent_X))
+           pred_newtest <-test_gbm(fit_train,Independent_X))
     
     save(pred_newtest, file="../output/pred_gbm.RData")
   } else {
