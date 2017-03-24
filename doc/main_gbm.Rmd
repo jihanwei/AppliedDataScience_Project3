@@ -123,14 +123,14 @@ source("../lib/test_gbm.R")
 source("../lib/cross_validation_gbm.R")
 
 if(run.cv){
-  err_cv <- data.frame(matrix(nrow=nb_trees,ncol=3))
+  err_cv_shr <- data.frame(matrix(nrow=nb_trees,ncol=3))
   for(k in 1:length(shrinkage_values)){
     cat("k=", k, "\n")
-    err_cv[,k] <- cv.function(df.train, shrinkage_values[k], K)
+    err_cv_shr[,k] <- cv.function.shr(df.train, shrinkage_values[k], K)
   }
-  err_cv$nb.trees <- seq_len(nb_trees)
-  err_cv <- tidyr::gather(err_cv, shrinkage, error, X1:X3, factor_key=FALSE)
-  save(err_cv, file="../output/gbm_err_cv.RData")
+  err_cv_shr$nb.trees <- seq_len(nb_trees)
+  err_cv_shr <- tidyr::gather(err_cv_shr, shrinkage, error, X1:X3, factor_key=FALSE)
+  save(err_cv_shr, file="../output/gbm_err_cv_shr.RData")
 }
 ```
 
@@ -138,9 +138,9 @@ Visualize cross-validation results.
 
 ```{r cv_vis}
 if(run.cv){
-  load("../output/err_cv.RData")
+  load("../output/err_cv_shr.RData")
   #pdf("../fig/cv_results.pdf", width=7, height=5)
-  g <- ggplot(err_cv, aes(nb.trees, error, colour=shrinkage)) +
+  g <- ggplot(err_cv_shr, aes(nb.trees, error, colour=shrinkage)) +
   geom_line() +
   ylab("CV Error Rate") +
   xlab("Number of trees") + 
@@ -156,14 +156,20 @@ if(run.cv){
 ```{r best_model}
 model_best=model_values[1]
 if(run.cv){
-  row <- which.min(err_cv$error)
-  model_best.nb_trees <- err_cv$nb.trees[row]
-  model_best.shrinkage <- err_cv$shrinkage[row]
+  row <- which.min(err_cv_shr$error)
+  model_best.nb_trees <- err_cv_shr$nb.trees[row]
+  model_best.shrinkage <- err_cv_shr$shrinkage[row]
   par_best <- list(nb_trees=model_best.nb_trees, shrinkage=model_best.shrinkage)
 } else {
   par_best <- list(nb_trees=13000, shrinkage=0.001)
 }
 
+```
+
+Compute CV Error on the train set with selected parameters
+```{r}
+err_cv <- cv.function(df.train, K, par_best)
+save(err_cv, file="../output/gbm_err_cv.RData")
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
@@ -178,7 +184,7 @@ Feed the final training model with the completely holdout testing data.
 ```{r test}
 tm_test=NA
 if(run.test){
-  load(file="../output/fit_train.RData")
+  load(file="../output/gbm_fit_train.RData")
   tm_test <- system.time(pred_test <- test(fit_train, df.test))
   save(pred_test, file="../output/gbm_pred_test.RData")
   table(pred_test, df.test$labels)
